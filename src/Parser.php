@@ -216,20 +216,28 @@ class Parser
     }
 
     /**
-     * To avoid splitting on scoped package-names, every but the last @ are considered
-     * package name.
-     *
      * @param string $versionString
-     *
-     * @return string[]
+     * @return array{string, string}
+     * @throws ParserException
      */
     public static function splitVersionString($versionString)
     {
-         $parts = explode('@', $versionString);
-         $version = array_pop($parts);
-         return [
-             implode('@', $parts),
-             $version
-         ];
+        if (strpos($versionString, '@') === 0) {
+            $prefix = '@';
+            $rest = substr($versionString, 1);
+        } else {
+            $prefix = '';
+            $rest = $versionString;
+        }
+
+        $atPos = strpos($rest, '@');
+        if ($atPos === 0 || $atPos === false) {
+            throw new ParserException('Invalid version string: ' . $versionString);
+        }
+
+        return [
+            $prefix . substr($rest, 0, $atPos),
+            substr($rest, $atPos + 1)
+        ];
     }
 }
