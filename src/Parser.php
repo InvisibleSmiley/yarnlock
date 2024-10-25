@@ -222,22 +222,15 @@ class Parser
      */
     public static function splitVersionString($versionString)
     {
-        if (strpos($versionString, '@') === 0) {
-            $prefix = '@';
-            $rest = substr($versionString, 1);
-        } else {
-            $prefix = '';
-            $rest = $versionString;
+        // Scoped package names start with an "@" → skip the first character.
+        // Note: $versionString may contain even more than two "@" if version is "protocol://user@host..."
+        $location = strpos($versionString, '@', 1);
+        if ($location > 0) {
+            $name = substr($versionString, 0, $location);
+            $version = substr($versionString, $location + 1);
+            return [$name, $version];
         }
 
-        $atPos = strpos($rest, '@');
-        if ($atPos === 0 || $atPos === false) {
-            throw new ParserException('Invalid version string: ' . $versionString);
-        }
-
-        return [
-            $prefix . substr($rest, 0, $atPos),
-            substr($rest, $atPos + 1)
-        ];
+        throw new ParserException('Invalid version string: ' . $versionString);
     }
 }
