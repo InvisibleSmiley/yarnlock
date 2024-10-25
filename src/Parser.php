@@ -231,6 +231,6 @@ class Parser
             return [$name, $version];
         }
 
-        throw new ParserException('Invalid version string: ' . $versionString);
+        throw new ParserException('Invalid version string: ' . $versionString, 1729855362);
     }
 }
